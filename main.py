@@ -2,6 +2,8 @@ import pygame
 import constantes
 from escala import escalar_img
 from personaje import Personaje
+from weapons import weapon
+from hud import casilla_arma
   
    #inicilizar pygame
 pygame.init() 
@@ -11,16 +13,30 @@ ventana = pygame.display.set_mode((constantes.WIDTH, constantes.HEIGHT))
     #nombre de la ventana
 pygame.display.set_caption("Juego 2D")
 
-#imagen, animacion y escala del personaje
+#Importar imagenes
+    #imagen, animacion y escala del personaje
 animaciones = []
 for i in range (8):
     img = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
     img = escalar_img(img, constantes.ESCALA_PERSONAJE)
     animaciones.append(img)
 
+    #HUD (seleccion arma)
+imagen_selec_arma = pygame.image.load("assets\\images\\Recuadros\\recuadro_arma_1.png")
+imagen_selec_arma = escalar_img(imagen_selec_arma, constantes.ESCALA_CUAD_ARMA)
+cuad_arma = casilla_arma(680, 500, imagen_selec_arma)
+
+
+    #Arma / // // // seguir aca 
+imagen_arco = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
+
 #creamos un objeto (en este caso, personaje)
-jugador = Personaje(100,100, animaciones)
- 
+jugador = Personaje(50,50, animaciones)
+
+#crear un arma de la clase weapons / /// // ¡SEGUIR ACA!
+arco = weapon(imagen_arco) 
+
+
     #definir las variables de movimiento del jugador
 mover_arriba = False
 mover_abajo = False
@@ -61,6 +77,9 @@ while run:
     
     #dibujamos el personaje
     jugador.dibujar(ventana)
+
+    #dibujamos el cuadrado de seleccion de arma
+    cuad_arma.dibujar(ventana)
     
     #los eventos son los comandos (teclas apretada/clics)
     for event in pygame.event.get():
