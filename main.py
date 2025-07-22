@@ -4,6 +4,7 @@ from escala import escalar_img
 from personaje import Personaje
 from weapons import weapon
 from hud import casilla_arma
+
   
    #inicilizar pygame
 pygame.init() 
@@ -15,11 +16,24 @@ pygame.display.set_caption("Juego 2D")
 
 #Importar imagenes
     #imagen, animacion y escala del personaje
+
+
 animaciones = []
+
+evento = 0
+
+    #Animacion del personaje corriendo
 for i in range (8):
     img = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
     img = escalar_img(img, constantes.ESCALA_PERSONAJE)
     animaciones.append(img)
+
+   #Animacion del personaje atacando con arco
+for i in range (9):
+    img_at_bow = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierAttackBow\soldier_at_bow_{i}.png")
+    img_at_bow = escalar_img(img_at_bow, constantes.ESCALA_PERSONAJE)
+    animaciones.append(img_at_bow)    
+    
 
     #HUD (seleccion arma)
 imagen_selec_arma = pygame.image.load("assets\\images\\Recuadros\\recuadro_arma_1.png")
@@ -28,13 +42,13 @@ cuad_arma = casilla_arma(680, 500, imagen_selec_arma)
 
 
     #Arma / // // // seguir aca 
-imagen_arco = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
+#imagen_arco = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
 
 #creamos un objeto (en este caso, personaje)
 jugador = Personaje(50,50, animaciones)
 
 #crear un arma de la clase weapons / /// // ¡SEGUIR ACA!
-arco = weapon(imagen_arco) 
+#arco = weapon(imagen_arco) 
 
 
     #definir las variables de movimiento del jugador
@@ -88,27 +102,38 @@ while run:
         
         #esto es el evento de aprentar una tecla
         if event.type == pygame.KEYDOWN:
-           if event.key == pygame.K_a:
+            if event.key == pygame.K_a:
                 mover_izquierda = True
-           if event.key == pygame.K_s:
+            if event.key == pygame.K_s:
                 mover_abajo = True
-           if event.key == pygame.K_d:
+            if event.key == pygame.K_d:
                 mover_derecha = True
-           if event.key == pygame.K_w:
+            if event.key == pygame.K_w:
                 mover_arriba = True
-        
+
+        #evento de apretar clic izq    
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                print("CLIC APRETADO")
+    
         #esto es el evento de soltar una tecla
 
         if event.type == pygame.KEYUP:
-           if event.key == pygame.K_a:
+            if event.key == pygame.K_a:
                 mover_izquierda = False
-           if event.key == pygame.K_s:
+            if event.key == pygame.K_s:
                 mover_abajo = False
-           if event.key == pygame.K_d:
+            if event.key == pygame.K_d:
                 mover_derecha = False
-           if event.key == pygame.K_w:
-                mover_arriba = False
-
+            if event.key == pygame.K_w:
+                    mover_arriba = False
+        
+        #evento de soltar clic izq
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                
+                print("CLIC SOLTADO")
+    
     #esto actualiza la pantalla constantemente para que se vayan mostrando los cambios
     pygame.display.update()
 
