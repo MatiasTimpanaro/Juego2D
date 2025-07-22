@@ -4,6 +4,7 @@ from escala import escalar_img
 from personaje import Personaje
 from weapons import weapon
 from hud import casilla_arma
+from animaciones import AnimacionesPersonaje
 
   
    #inicilizar pygame
@@ -14,25 +15,11 @@ ventana = pygame.display.set_mode((constantes.WIDTH, constantes.HEIGHT))
     #nombre de la ventana
 pygame.display.set_caption("Juego 2D")
 
-#Importar imagenes
-    #imagen, animacion y escala del personaje
+#Importar animaciones
 
-
-animaciones = []
-
-evento = 0
-
-    #Animacion del personaje corriendo
-for i in range (8):
-    img = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
-    img = escalar_img(img, constantes.ESCALA_PERSONAJE)
-    animaciones.append(img)
-
-   #Animacion del personaje atacando con arco
-for i in range (9):
-    img_at_bow = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierAttackBow\soldier_at_bow_{i}.png")
-    img_at_bow = escalar_img(img_at_bow, constantes.ESCALA_PERSONAJE)
-    animaciones.append(img_at_bow)    
+    #animacion del personaje
+animaciones_personaje = AnimacionesPersonaje()
+animaciones = animaciones_personaje.get_animacion("caminar")
     
 
     #HUD (seleccion arma)
@@ -40,22 +27,18 @@ imagen_selec_arma = pygame.image.load("assets\\images\\Recuadros\\recuadro_arma_
 imagen_selec_arma = escalar_img(imagen_selec_arma, constantes.ESCALA_CUAD_ARMA)
 cuad_arma = casilla_arma(680, 500, imagen_selec_arma)
 
-
-    #Arma / // // // seguir aca 
-#imagen_arco = pygame.image.load(f"assets\images\characters\Characters(100x100)\Soldier\Soldier\SoldierWalkDivide\soldier-{i}.png")
-
 #creamos un objeto (en este caso, personaje)
 jugador = Personaje(50,50, animaciones)
 
 #crear un arma de la clase weapons / /// // ¡SEGUIR ACA!
 #arco = weapon(imagen_arco) 
 
-
     #definir las variables de movimiento del jugador
 mover_arriba = False
 mover_abajo = False
 mover_izquierda = False
 mover_derecha = False
+clic_izquiero = False
 
  #controlar el Frame Rate
 reloj = pygame.time.Clock()
@@ -86,7 +69,7 @@ while run:
     jugador.movimiento(delta_x, delta_y)
     
     #animar el personaje y hacer que si no se presiona nada, no se mueva (se hacen con los delta x/y)
-    en_movimiento = delta_x != 0 or delta_y != 0
+    en_movimiento = delta_x != 0 or delta_y != 0 or clic_izquiero == True
     jugador.update(en_movimiento)
     
     #dibujamos el personaje
@@ -110,14 +93,14 @@ while run:
                 mover_derecha = True
             if event.key == pygame.K_w:
                 mover_arriba = True
-
-        #evento de apretar clic izq    
+       #evento de apretar el clic izquierdo
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                print("CLIC APRETADO")
-    
+                clic_izquiero = True
+                jugador.animaciones = animaciones_personaje.get_animacion("atacarArco")
+                jugador.frame_index = 0
+                  
         #esto es el evento de soltar una tecla
-
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
                 mover_izquierda = False
@@ -127,13 +110,13 @@ while run:
                 mover_derecha = False
             if event.key == pygame.K_w:
                     mover_arriba = False
-        
-        #evento de soltar clic izq
+        #evento de soltar el clic izquierdo
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
+                clic_izquiero = False
+                jugador.animaciones = animaciones_personaje.get_animacion("caminar")
                 
-                print("CLIC SOLTADO")
-    
+                
     #esto actualiza la pantalla constantemente para que se vayan mostrando los cambios
     pygame.display.update()
 
