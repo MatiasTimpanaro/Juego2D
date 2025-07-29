@@ -17,6 +17,7 @@ class AnimacionesPersonaje:
             img_at_bow = pygame.image.load(f"assets/images/characters/Characters(100x100)/Soldier/Soldier/SoldierAttackBow/soldier_at_bow_{i}.png")
             img_at_bow = escalar_img(img_at_bow, constantes.ESCALA_PERSONAJE)
             self.atacar.append(img_at_bow)
+            
 
 #llamar a la animacion correspondiente
     def get_animacion(self, tipo):

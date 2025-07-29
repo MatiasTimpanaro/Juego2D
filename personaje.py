@@ -32,27 +32,48 @@ class Personaje():
             self.frame_index = 0
         self.image = self.animaciones[self.frame_index]
 
+    def dibujar(self, interfaz):
+        imagen = self.image
+        if self.flip:
+            imagen = pygame.transform.flip(self.image, True, False)
+        rect_imagen = imagen.get_rect()
 
-    def dibujar (self, interfaz):
-        
-         #para dar vuelta la imagen, el primer False es para eje x y el 2do para el eje y       
-        imagen_flip = pygame.transform.flip(self.image, self.flip, False)    
+        if hasattr(self, "tipo_animacion") and self.tipo_animacion == "atacarArco":
+            if self.flip:
+                rect_imagen.width += constantes.EXPANSION
+                rect_imagen.right = self.forma.right
+            else:
+                rect_imagen.width += constantes.EXPANSION
+                rect_imagen.left = self.forma.left
+        else:
+            if self.flip:
+                rect_imagen.right = self.forma.right
+            else:
+                rect_imagen.left = self.forma.left
 
-        #mostramos el personaje (forma)
-        interfaz.blit(imagen_flip, self.forma)
+        rect_imagen.top = self.forma.top
+
+        interfaz.blit(imagen, rect_imagen)
+        pygame.draw.rect(interfaz, constantes.COLOR_PERSONAJE, rect_imagen, 1)
         
-            #esto dibuja en la "ventana", algo fucsia (CONSTANTE), que es la forma (self.forma)        
-            #esta comentada para que no moleste
-        #pygame.draw.rect(interfaz, constantes.COLOR_PERSONAJE, self.forma, 1)
-    
     #funcion de movimiento
-    def movimiento (self, delta_x, delta_y):
-        
-        #para que mira para ambos lados
+    def movimiento(self, delta_x, delta_y):
+        flip_anterior = self.flip
+
         if delta_x < 0:
             self.flip = True
         if delta_x > 0:
             self.flip = False
 
-        self.forma.x = self.forma.x + delta_x
-        self.forma.y = self.forma.y + delta_y
+        # Compensar el salto al cambiar el flip
+        if self.flip != flip_anterior:
+            constantes.EXPANSION if hasattr(self, "tipo_animacion") and self.tipo_animacion == "atacarArco" else 0
+            if self.flip:
+                # De derecha a izquierda: mantener el borde derecho fijo
+                self.forma.right = self.forma.left + self.forma.width + constantes.EXPANSION
+            else:
+                # De izquierda a derecha: mantener el borde izquierdo fijo
+                self.forma.left = self.forma.right - self.forma.width - constantes.EXPANSION
+
+        self.forma.x += delta_x
+        self.forma.y += delta_y
