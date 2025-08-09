@@ -1,4 +1,6 @@
 import pygame
+import constantes
+from escala import escalar_img
 
 class weapon():
     def __init__(self, image):
@@ -10,5 +12,6 @@ class weapon():
     def update (self, personaje):
         self.forma.center = personaje.forma.center
 
-    def dibujar (self, interfaz):
-        interfaz.blit (self.imagen, self.forma)
+    def dibujar_flecha (self, interfaz):
+        img_arrow = pygame.image.load("assets\images\arrow(Projectile)\Arrow01(100x100).png")
+        img_arrow = escalar_img(img_arrow, constantes.ESCALA_ARROW)

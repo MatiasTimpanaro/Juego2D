@@ -32,6 +32,7 @@ class Personaje():
             self.frame_index = 0
         self.image = self.animaciones[self.frame_index]
 
+    #funcion de dibujo del personaje, flip 
     def dibujar(self, interfaz):
         imagen = self.image
         if self.flip:
@@ -54,8 +55,10 @@ class Personaje():
         rect_imagen.top = self.forma.top
 
         interfaz.blit(imagen, rect_imagen)
+
+       #mostrar rectangulo del personaje
         pygame.draw.rect(interfaz, constantes.COLOR_PERSONAJE, rect_imagen, 1)
-        
+
     #funcion de movimiento
     def movimiento(self, delta_x, delta_y):
         flip_anterior = self.flip
