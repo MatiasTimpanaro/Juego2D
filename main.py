@@ -13,6 +13,12 @@ pygame.init()
 ventana = pygame.display.set_mode((constantes.WIDTH, constantes.HEIGHT))
 pygame.display.set_caption("Monsters")
 
+# Cargar la imagen del fondo
+background_image = pygame.image.load("assets\\images\\fondos\\fondo1.jpg")
+
+# Ajustar la imagen al tamaño de la pantalla (opcional)
+background_image = pygame.transform.scale(background_image, (constantes.WIDTH, constantes.HEIGHT))
+
 animaciones_personaje = AnimacionesPersonaje()
 animaciones = animaciones_personaje.get_animacion("caminar")
 
@@ -35,7 +41,11 @@ run = True
 
 while run:
     reloj.tick(constantes.FPS)
-    ventana.fill(constantes.COLOR_FONDO)
+   # ventana.fill(constantes.COLOR_FONDO)
+
+    # Dibujar el fondo
+    ventana.blit(background_image, (0, 0))
+
 
     delta_x = 0
     delta_y = 0
