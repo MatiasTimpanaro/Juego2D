@@ -80,3 +80,11 @@ class Personaje():
 
         self.forma.x += delta_x
         self.forma.y += delta_y
+
+    def mirar_mouse(self, mouse_pos):
+        """Gira el personaje para mirar hacia el mouse, sin moverlo"""
+        mouse_x, _ = mouse_pos
+        if mouse_x < self.forma.centerx:
+            self.flip = True
+        else:
+            self.flip = False

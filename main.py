@@ -5,89 +5,91 @@ from personaje import Personaje
 from weapons import weapon
 from hud import casilla_arma
 from animaciones import AnimacionesPersonaje
-
+from flecha import Flecha
   
    #inicilizar pygame
-pygame.init() 
 
-#crear la ventana
+pygame.init()
 ventana = pygame.display.set_mode((constantes.WIDTH, constantes.HEIGHT))
-    #nombre de la ventana
 pygame.display.set_caption("Monsters")
 
-#Importar animaciones
-
-    #animacion del personaje
 animaciones_personaje = AnimacionesPersonaje()
 animaciones = animaciones_personaje.get_animacion("caminar")
-    
 
-    #HUD (seleccion arma)
 imagen_selec_arma = pygame.image.load("assets\\images\\Recuadros\\recuadro_arma_1.png")
 imagen_selec_arma = escalar_img(imagen_selec_arma, constantes.ESCALA_CUAD_ARMA)
 cuad_arma = casilla_arma(680, 500, imagen_selec_arma)
 
-    #creamos un objeto (en este caso, personaje)
-jugador = Personaje(50,50, animaciones)
-
-    #imagen de flecha
+jugador = Personaje(50, 50, animaciones)
 arrow = animaciones_personaje.get_animacion("arrow")
 
-    #definir las variables de movimiento del jugador
-mover_arriba = False
-mover_abajo = False
-mover_izquierda = False
-mover_derecha = False
+mover_arriba = mover_abajo = mover_izquierda = mover_derecha = False
 clic_izquiero = False
 
- #controlar el Frame Rate
-reloj = pygame.time.Clock()
+flechas = []
+ultimo_disparo = 0
+cooldown_disparo = 500  # milisegundos entre disparos
 
-    #crear el loop para que permanezca abierta la ventana
+reloj = pygame.time.Clock()
 run = True
 
 while run:
-   
-    #que vaya a 60 FPS (constante)
     reloj.tick(constantes.FPS)
-
     ventana.fill(constantes.COLOR_FONDO)
-    #Calcular el movimiento del jugador
+
     delta_x = 0
     delta_y = 0
 
-    if mover_derecha == True:
+    if mover_derecha:
         delta_x = constantes.VELOCIDAD
-    if mover_izquierda == True:
+    if mover_izquierda:
         delta_x = -constantes.VELOCIDAD
-    if mover_arriba == True:
+    if mover_arriba:
         delta_y = -constantes.VELOCIDAD
-    if mover_abajo == True:
+    if mover_abajo:
         delta_y = constantes.VELOCIDAD
-    
-    #mover al jugador
+
     jugador.movimiento(delta_x, delta_y)
     posic_X = jugador.forma.centerx
     posic_Y = jugador.forma.centery
 
-    #animar el personaje y hacer que si no se presiona nada, no se mueva (se hacen con los delta x/y)
-    en_movimiento = delta_x != 0 or delta_y != 0 or clic_izquiero == True
+    # Actualizar animaciones
+    en_movimiento = delta_x != 0 or delta_y != 0 or clic_izquiero
     jugador.update(en_movimiento)
 
-    #dibujamos el personaje
-    jugador.dibujar(ventana)
+    # Disparo automático sincronizado con animación
+    if clic_izquiero:
+        tiempo_actual = pygame.time.get_ticks()
+        # Verificamos cooldown
+        if tiempo_actual - ultimo_disparo >= cooldown_disparo:
+            # Disparo sincronizado en frame 7 (ajustar según animación real)
+            if jugador.frame_index == 7:
+                mouse_pos = pygame.mouse.get_pos()
+                # Offset según dirección
+                offset_x = 30 if not jugador.flip else -30
+                offset_y = 30
+                spawn_x = posic_X + offset_x
+                spawn_y = posic_Y + offset_y
+                flechas.append(Flecha(spawn_x, spawn_y, mouse_pos, arrow[0]))
+                ultimo_disparo = tiempo_actual
 
-    #dibujamos el cuadrado de seleccion de arma
+    # Dibujar jugador y HUD
+    jugador.dibujar(ventana)
     cuad_arma.dibujar(ventana)
-    
-    flecha = Personaje(posic_X, posic_Y, arrow)
-    flecha.dibujar(ventana)
-    #los eventos son los comandos (teclas apretada/clics)
+
+   
+    # Actualizar y dibujar flechas
+    for f in flechas[:]:
+        f.update()
+        f.draw(ventana)
+        if f.fuera_de_pantalla():
+            flechas.remove(f)
+
+    # Eventos
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-         run = False   
-        
-        #esto es el evento de aprentar una tecla
+            run = False
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
                 mover_izquierda = True
@@ -98,16 +100,11 @@ while run:
             if event.key == pygame.K_w:
                 mover_arriba = True
 
-       #evento de apretar el clic izquierdo
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                clic_izquiero = True
-                jugador.animaciones = animaciones_personaje.get_animacion("atacarArco")
-                jugador.frame_index = 0
-               
-                
-                                                                  
-        #esto es el evento de soltar una tecla
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            clic_izquiero = True
+            jugador.animaciones = animaciones_personaje.get_animacion("atacarArco")
+            jugador.frame_index = 0
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
                 mover_izquierda = False
@@ -116,20 +113,13 @@ while run:
             if event.key == pygame.K_d:
                 mover_derecha = False
             if event.key == pygame.K_w:
-                    mover_arriba = False
+                mover_arriba = False
 
-        #evento de soltar el clic izquierdo
-        if event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
-                clic_izquiero = False
-                jugador.animaciones = animaciones_personaje.get_animacion("caminar")
-                
-                
-    #esto actualiza la pantalla constantemente para que se vayan mostrando los cambios
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            clic_izquiero = False
+            jugador.animaciones = animaciones_personaje.get_animacion("caminar")
+
     pygame.display.update()
 
-#esto cierra el juego 
-pygame.quit()   
-        
-
+pygame.quit()
 
